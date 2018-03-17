@@ -1,6 +1,7 @@
 package com.bigfatcaterpillar.first2048;
 
 
+import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import java.util.Map;
 import java.util.Random;
@@ -29,6 +31,7 @@ public class Board {
     private Map<Position,Tile> tileDrawMap;
     private static final String TAG = "Board";
     private GameState gameState;
+    private boolean doTransition = true;
 
     public Board() {
         // setup board with empty tiles
@@ -282,11 +285,8 @@ public class Board {
     }
 
     public boolean swipeLeft(Context context, ConstraintLayout view){
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-
-                TransitionManager transitionManager = new TransitionManager();
-                transitionManager.beginDelayedTransition(view);
-
+        if (doTransition && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            this.doTransitionCall(view);
         }
         Position currPos = new Position(0,0);
         Position nextPos = new Position(0,0);
@@ -324,11 +324,8 @@ public class Board {
     }
 
     public boolean swipeRight(Context context, ConstraintLayout view){
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-
-            TransitionManager transitionManager = new TransitionManager();
-            transitionManager.beginDelayedTransition(view);
-
+        if (doTransition && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            this.doTransitionCall(view);
         }
         Position currPos = new Position(0,0);
         Position nextPos = new Position(0,0);
@@ -366,11 +363,8 @@ public class Board {
     }
 
     public boolean swipeUp(Context context, ConstraintLayout view){
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-
-            TransitionManager transitionManager = new TransitionManager();
-            transitionManager.beginDelayedTransition(view);
-
+        if (doTransition && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            this.doTransitionCall(view);
         }
 
         Position currPos = new Position(0,0);
@@ -408,12 +402,10 @@ public class Board {
     }
 
     public boolean swipeSwipeDown(Context context, ConstraintLayout view){
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-
-            TransitionManager transitionManager = new TransitionManager();
-            transitionManager.beginDelayedTransition(view);
-
+        if (doTransition && android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            this.doTransitionCall(view);
         }
+
         Position currPos = new Position(0,0);
         Position nextPos = new Position(0,0);
         int y0, y1;
@@ -449,6 +441,15 @@ public class Board {
         return moved;
     }
 
+    private void doTransitionCall(ConstraintLayout view){
+        //TransitionManager transitionManager = new TransitionManager();
+        //transitionManager.beginDelayedTransition(view);
+        LayoutTransition layoutTransition = new LayoutTransition();
+        layoutTransition.enableTransitionType(LayoutTransition.CHANGING);
+        layoutTransition.setDuration(500);
+        view.setLayoutTransition(layoutTransition);
+
+    }
 
 
 }
