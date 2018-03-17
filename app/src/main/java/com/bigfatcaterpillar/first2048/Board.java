@@ -2,7 +2,12 @@ package com.bigfatcaterpillar.first2048;
 
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+import android.renderscript.Allocation;
 import android.support.constraint.ConstraintLayout;
+import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.View;
@@ -77,7 +82,7 @@ public class Board {
         imageView.setY(tilePos.getY1());
         imageView.setMaxHeight(tilePos.getHeight());
         imageView.setMaxWidth(tilePos.getWidth());
-        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
         imageView.setImageResource( resourceId );
         int viewId = View.generateViewId();
@@ -125,17 +130,33 @@ public class Board {
                             "mipmap",
                             context.getPackageName());
 
+                    imageView.setImageResource( resourceId );
                     imageView.setAdjustViewBounds(true);
-                    imageView.setX(tilePos.getX1());
-                    imageView.setY(tilePos.getY1());
+                    BitmapFactory.Options dimensions = new BitmapFactory.Options();
+                    dimensions.inJustDecodeBounds = true;
+
+                    Drawable drawable =  context.getResources().getDrawable(resourceId);
+
+                    int height = drawable.getIntrinsicHeight();
+                    int width = drawable.getIntrinsicWidth();
+//                    Bitmap mBitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.num2, dimensions);
+//                    int height = dimensions.outHeight;
+//                    int width =  dimensions.outWidth;
+                    drawable = null;
+                    int xpad = (tilePos.getWidth() - width )/2;
+                    int ypad = (tilePos.getHeight() - height)/2;
+                    if (xpad < 0) xpad = 0;
+                    if (ypad < 0) xpad = 0;
+                    imageView.setX(tilePos.getX1()+xpad);
+                    imageView.setY(tilePos.getY1()+ypad);
                     imageView.setMaxHeight(tilePos.getHeight());
                     imageView.setMaxWidth(tilePos.getWidth());
                     imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
-                    imageView.setImageResource( resourceId );
                     int viewId = View.generateViewId();
                     gameState.getCurrTiles()[x1][y1].setViewId(viewId);
                     gameState.getCurrTiles()[x1][y1].setImageView(imageView);
+
                     imageView.setId(viewId);
                     view.addView(imageView);
                     return true;
@@ -166,15 +187,19 @@ public class Board {
             // current tile doesn't have a value so we don't move it
         }
         else if ((currTile.getValue() != 0) && (newTile.getValue() == 0)) {
-           // need to move curr tile to new tile position and repoint image location
-           // on curr tile to new location
-           Tile tilePos = this.getTileDrawMap().get(newPos);
-           ImageView tileImage = currTile.getImageView();
-           tileImage.setX(tilePos.getX1());
-           tileImage.setY(tilePos.getY1());
-           // below updates the new tile in array with updated currTile.
-           newTile.setAll(currTile);
-           currTile.reset();
+            // need to move curr tile to new tile position and repoint image location
+            // on curr tile to new location
+            Tile tilePos = this.getTileDrawMap().get(newPos);
+            ImageView tileImage = currTile.getImageView();
+            int xpad = (tilePos.getWidth() - tileImage.getWidth() )/2;
+            int ypad = (tilePos.getHeight() - tileImage.getHeight())/2;
+            if (xpad < 0) xpad = 0;
+            if (ypad < 0) xpad = 0;
+            tileImage.setX(tilePos.getX1()+xpad);
+            tileImage.setY(tilePos.getY1()+ypad);
+            // below updates the new tile in array with updated currTile.
+            newTile.setAll(currTile);
+            currTile.reset();
 
 
         }
@@ -186,30 +211,34 @@ public class Board {
 
             Log.d(TAG, "moveTile (before replace move): " + this.toString());
             // need to move curr tile to new tile position and repoint image location
-           // on curr tile to new location
-           Tile tilePos = this.getTileDrawMap().get(newPos);
-           ImageView tileImage = currTile.getImageView();
-           tileImage.setX(tilePos.getX1());
-           tileImage.setY(tilePos.getY1());
+            // on curr tile to new location
+            Tile tilePos = this.getTileDrawMap().get(newPos);
+            ImageView tileImage = currTile.getImageView();
+            int xpad = (tilePos.getWidth() - tileImage.getWidth() )/2;
+            int ypad = (tilePos.getHeight() - tileImage.getHeight())/2;
+            if (xpad < 0) xpad = 0;
+            if (ypad < 0) xpad = 0;
+            tileImage.setX(tilePos.getX1()+xpad);
+            tileImage.setY(tilePos.getY1()+ypad);
 
-           ImageView removeImage = newTile.getImageView();
-           // below updates the new tile with updated currTile location change.
-           newTile.setAll(currTile);
-           currTile.reset();
-           gameState.setNumberOfTiles(gameState.getNumberOfTiles()-1);
-           if (removeImage != null){
+            ImageView removeImage = newTile.getImageView();
+            // below updates the new tile with updated currTile location change.
+            newTile.setAll(currTile);
+            currTile.reset();
+            gameState.setNumberOfTiles(gameState.getNumberOfTiles()-1);
+            if (removeImage != null){
                view.removeView(removeImage);
-           }
+            }
 
-           // We have a merge so need to update tile image to new number
-           newTile.setValue(newTile.getValue()*2);
-           int resourceId = context.getResources().getIdentifier(
+            // We have a merge so need to update tile image to new number
+            newTile.setValue(newTile.getValue()*2);
+            int resourceId = context.getResources().getIdentifier(
                    "num" + Integer.toString(newTile.getValue()),
                    "mipmap",
                    context.getPackageName());
-           newTile.getImageView().setImageResource(resourceId);
-           view.invalidate();
-           Log.d(TAG, "moveTile (after replace move): " + this.toString());
+            newTile.getImageView().setImageResource(resourceId);
+            view.invalidate();
+            Log.d(TAG, "moveTile (after replace move): " + this.toString());
 
         }
 
@@ -255,6 +284,12 @@ public class Board {
     }
 
     public boolean swipeLeft(Context context, ConstraintLayout view){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+
+            TransitionManager transitionManager = new TransitionManager();
+            transitionManager.beginDelayedTransition(view);
+
+        }
         Position currPos = new Position(0,0);
         Position nextPos = new Position(0,0);
         int x0, x1;
@@ -291,6 +326,12 @@ public class Board {
     }
 
     public boolean swipeRight(Context context, ConstraintLayout view){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+
+            TransitionManager transitionManager = new TransitionManager();
+            transitionManager.beginDelayedTransition(view);
+
+        }
         Position currPos = new Position(0,0);
         Position nextPos = new Position(0,0);
         int x0, x1;
@@ -369,6 +410,12 @@ public class Board {
     }
 
     public boolean swipeSwipeDown(Context context, ConstraintLayout view){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+
+            TransitionManager transitionManager = new TransitionManager();
+            transitionManager.beginDelayedTransition(view);
+
+        }
         Position currPos = new Position(0,0);
         Position nextPos = new Position(0,0);
         int y0, y1;
@@ -400,6 +447,7 @@ public class Board {
                 }
 
             }
+
         return moved;
     }
 
