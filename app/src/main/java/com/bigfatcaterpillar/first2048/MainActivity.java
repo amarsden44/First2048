@@ -127,11 +127,6 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        if (savedInstanceState == null)
-            gameStarted = false;
-        else
-            gameStarted = true;
-
     }
 
     @Override

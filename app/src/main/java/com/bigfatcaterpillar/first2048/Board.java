@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.renderscript.Allocation;
 import android.support.constraint.ConstraintLayout;
+import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -212,33 +213,30 @@ public class Board {
             Log.d(TAG, "moveTile (before replace move): " + this.toString());
             // need to move curr tile to new tile position and repoint image location
             // on curr tile to new location
-            Tile tilePos = this.getTileDrawMap().get(newPos);
-            ImageView tileImage = currTile.getImageView();
-            int xpad = (tilePos.getWidth() - tileImage.getWidth() )/2;
-            int ypad = (tilePos.getHeight() - tileImage.getHeight())/2;
-            if (xpad < 0) xpad = 0;
-            if (ypad < 0) xpad = 0;
-            tileImage.setX(tilePos.getX1()+xpad);
-            tileImage.setY(tilePos.getY1()+ypad);
+            // update current tile with new tile positions.
+            float x = newTile.getImageView().getX();
 
-            ImageView removeImage = newTile.getImageView();
-            // below updates the new tile with updated currTile location change.
-            newTile.setAll(currTile);
+            // move current tile image to destination location.
+            currTile.getImageView().setX(newTile.getImageView().getX());
+            currTile.getImageView().setY(newTile.getImageView().getY());
+
+            // now that it has moved we don't need it anymore as we will be updating
+            // the new tile that is also in this location with a new image
+            view.removeView(currTile.getImageView());
             currTile.reset();
-            gameState.setNumberOfTiles(gameState.getNumberOfTiles()-1);
-            if (removeImage != null){
-               view.removeView(removeImage);
-            }
 
+            // update image on current tile
             // We have a merge so need to update tile image to new number
             newTile.setValue(newTile.getValue()*2);
             int resourceId = context.getResources().getIdentifier(
-                   "num" + Integer.toString(newTile.getValue()),
-                   "mipmap",
-                   context.getPackageName());
+                    "num" + Integer.toString(newTile.getValue()),
+                    "mipmap",
+                    context.getPackageName());
             newTile.getImageView().setImageResource(resourceId);
-            view.invalidate();
+            //view.invalidate();
+            gameState.setNumberOfTiles(gameState.getNumberOfTiles()-1);
             Log.d(TAG, "moveTile (after replace move): " + this.toString());
+
 
         }
 
@@ -284,10 +282,10 @@ public class Board {
     }
 
     public boolean swipeLeft(Context context, ConstraintLayout view){
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
 
-            TransitionManager transitionManager = new TransitionManager();
-            transitionManager.beginDelayedTransition(view);
+                TransitionManager transitionManager = new TransitionManager();
+                transitionManager.beginDelayedTransition(view);
 
         }
         Position currPos = new Position(0,0);
