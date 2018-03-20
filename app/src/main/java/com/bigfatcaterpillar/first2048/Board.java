@@ -86,7 +86,13 @@ public class Board {
         imageView.setY(tilePos.getY1());
         imageView.setMaxHeight(tilePos.getHeight());
         imageView.setMaxWidth(tilePos.getWidth());
-        imageView.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        LinearLayout.LayoutParams layoutParams =
+                new LinearLayout.LayoutParams(tilePos.getHeight(),tilePos.getWidth());
+        imageView.setLayoutParams(layoutParams);
+
+        imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+
+
 
         imageView.setImageResource( resourceId );
         int viewId = View.generateViewId();
@@ -134,27 +140,37 @@ public class Board {
                             "mipmap",
                             context.getPackageName());
 
+
                     imageView.setImageResource( resourceId );
                     imageView.setAdjustViewBounds(true);
-                    BitmapFactory.Options dimensions = new BitmapFactory.Options();
-                    dimensions.inJustDecodeBounds = true;
-
-                    Drawable drawable =  context.getResources().getDrawable(resourceId);
-
-                    int height = drawable.getIntrinsicHeight();
-                    int width = drawable.getIntrinsicWidth();
+                    //BitmapFactory.Options dimensions = new BitmapFactory.Options();
+                    //dimensions.inJustDecodeBounds = true;
 //                    Bitmap mBitmap = BitmapFactory.decodeResource(context.getResources(), R.mipmap.num2, dimensions);
 //                    int height = dimensions.outHeight;
 //                    int width =  dimensions.outWidth;
-                    drawable = null;
-                    int xpad = (tilePos.getWidth() - width )/2;
-                    int ypad = (tilePos.getHeight() - height)/2;
-                    if (xpad < 0) xpad = 0;
-                    if (ypad < 0) xpad = 0;
-                    imageView.setX(tilePos.getX1()+xpad);
-                    imageView.setY(tilePos.getY1()+ypad);
+
+                    //Drawable drawable =  context.getResources().getDrawable(resourceId);
+
+//                    int height = drawable.getIntrinsicHeight();
+//                    int width = drawable.getIntrinsicWidth();
+                    //imageView.setImageDrawable(drawable);
+
+
+                    //drawable = null;
+//                    int xpad = (tilePos.getWidth() - width )/2;
+//                    int ypad = (tilePos.getHeight() - height)/2;
+//                    if (xpad < 0) xpad = 0;
+//                    if (ypad < 0) xpad = 0;
+//                    imageView.setX(tilePos.getX1()+xpad);
+//                    imageView.setY(tilePos.getY1()+ypad);
+                    imageView.setX(tilePos.getX1());
+                    imageView.setY(tilePos.getY1());
                     imageView.setMaxHeight(tilePos.getHeight());
                     imageView.setMaxWidth(tilePos.getWidth());
+                    LinearLayout.LayoutParams layoutParams =
+                            new LinearLayout.LayoutParams(tilePos.getHeight(),tilePos.getWidth());
+                    imageView.setLayoutParams(layoutParams);
+
                     imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
 
                     int viewId = View.generateViewId();
@@ -195,12 +211,15 @@ public class Board {
             // on curr tile to new location
             Tile tilePos = this.getTileDrawMap().get(newPos);
             ImageView tileImage = currTile.getImageView();
-            int xpad = (tilePos.getWidth() - tileImage.getWidth() )/2;
-            int ypad = (tilePos.getHeight() - tileImage.getHeight())/2;
-            if (xpad < 0) xpad = 0;
-            if (ypad < 0) xpad = 0;
-            tileImage.setX(tilePos.getX1()+xpad);
-            tileImage.setY(tilePos.getY1()+ypad);
+//            int xpad = (tilePos.getWidth() - tileImage.getWidth() )/2;
+//            int ypad = (tilePos.getHeight() - tileImage.getHeight())/2;
+//            if (xpad < 0) xpad = 0;
+//            if (ypad < 0) xpad = 0;
+//            tileImage.setX(tilePos.getX1()+xpad);
+//            tileImage.setY(tilePos.getY1()+ypad);
+            tileImage.setX(tilePos.getX1());
+            tileImage.setY(tilePos.getY1());
+
             // below updates the new tile in array with updated currTile.
             newTile.setAll(currTile);
             currTile.reset();
@@ -214,10 +233,6 @@ public class Board {
                 return;
 
             Log.d(TAG, "moveTile (before replace move): " + this.toString());
-            // need to move curr tile to new tile position and repoint image location
-            // on curr tile to new location
-            // update current tile with new tile positions.
-            float x = newTile.getImageView().getX();
 
             // move current tile image to destination location.
             currTile.getImageView().setX(newTile.getImageView().getX());
@@ -445,7 +460,7 @@ public class Board {
         //TransitionManager transitionManager = new TransitionManager();
         //transitionManager.beginDelayedTransition(view);
         LayoutTransition layoutTransition = new LayoutTransition();
-        layoutTransition.enableTransitionType(LayoutTransition.CHANGING);
+//        layoutTransition.enableTransitionType(LayoutTransition.CHANGING);
         layoutTransition.setDuration(500);
         view.setLayoutTransition(layoutTransition);
 
